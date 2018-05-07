@@ -1,7 +1,7 @@
 Part 2
 Wine_Tour ( T_ID, T_Name, T_Description, T_Current_Price );
 PK: T_ID
-
+test
 Tour_Date ( TD_ID, T_ID, TD_Date, TD_Price );
 PK: TD_ID
 FK: T_ID References Wine_Tour
