@@ -206,6 +206,13 @@ INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (9, 12);
 
 PROMPT *** Customer ***
 INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C123', 'Joel', 'Warren', '7 Bluff Rd', 92142277);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C218', 'Sue', 'Armstrong', '1 High St', 92149911);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C178', 'Grant', 'Simpson', '23 Wall St', 92133311);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C191', 'Sarah', 'Charter', '19 Hill Ave', 92134477);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C334', 'Helen', 'Chin', '6 Red Rd', 92145500);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C367', 'Ryan', 'Chin', '6 Red Rd', 92145522);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C555', 'Ted', 'Smith', '7 John St', 92148000);
+
 
 /* CONSTRAINT AU_AUTHOR UNIQUE (sname, fname) */
 
