@@ -217,6 +217,12 @@ INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Cust
 INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C225', 'Ziggy', 'Lee', '17 Low St', 92149944);
 INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C215', 'Henry', 'Ryde', '8 White St', 92146688);
 
+PROMT *** Brochure ***
+INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R001', 'W1', 'C267', TO_DATE('2017/06/19', 'yyyy/mm/dd'));
+INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R002', 'B1', 'C215', TO_DATE('2017/08/19', 'yyyy/mm/dd'));
+INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R003', 'W1', 'C225', TO_DATE('2017/09/15', 'yyyy/mm/dd'));
+INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R004', 'W1', 'C218', TO_DATE('2017/01/05', 'yyyy/mm/dd'));
+INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R005', 'W1', 'C334', TO_DATE('2017/01/06', 'yyyy/mm/dd'));
 
 /* CONSTRAINT AU_AUTHOR UNIQUE (sname, fname) */
 
