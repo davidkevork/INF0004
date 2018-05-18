@@ -226,7 +226,7 @@ INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R005
 
 /* CONSTRAINT AU_AUTHOR UNIQUE (sname, fname) */
 
-PROMPT *** Part 4 Invalid insert statements A test of Validation Rules With a forword by D.Trump***
+PROMPT *** Part 4 Invalid insert statements A test of Validation Rules ***
 
 INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES ('B1', 22);
 INSERT INTO Customer_Booking (CUSTOMER_ID, TD_ID) VALUES ('C078','W1');
