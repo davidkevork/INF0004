@@ -1,9 +1,8 @@
-Part 2
+
 Wine_Tour ( T_ID, T_Name, T_Description, T_Current_Price );
 PK: T_ID
-test
-Tour_Date ( TD_ID, T_ID, TD_Date, TD_Price );
-PK: TD_ID
+
+Tour_Date ( T_ID, T_ID, TD_Date, TD_Price );
 FK: T_ID References Wine_Tour
 
 Wine_Experts (Expert_ID, Expert_First_Name, Expert_Last_Name, Expert_Phone_Number );
@@ -16,8 +15,8 @@ FK: Expert_ID References  Wine_Experts
 Customer ( Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone );
 PK: Customer_ID
 
-Brochure ( Request_ID, T_ID, Customer_ID, Request_Date );
-PK: Request_ID
+Brochure ( T_ID, Customer_ID, Request_Date );
+
 FK: T_ID References Wine_Tour
 FK: Customer_ID References Customer
 
@@ -33,11 +32,12 @@ FK: Gift_ID References Gift
 FK: TD_ID References Tour_Date
 FK: Customer_ID References Customer
 
-Customer_Booking ( Customer_ID, TD_ID );
+Customer_Booking ( Customer_ID, T_ID, TD_Date );
 FK: Customer_ID References Customer
-FK: TD_ID References Tour_Date
+FK: T_ID References WINE_TOUR
+FK: TD_Date References TOUR_DATE
 
-Customer_Payment (PAYMENT_ID, BOOKING_ID, CUSTOMER_ID, PAYMENT_TYPE)
+Customer_Payment (PAYMENT_ID, BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT)
 PK : PAYMENT_ID Starts at 1 IDENTITY then INCREMENTS by 1.
 FK : BOOKING_ID References Customer_Booking
 FK : CUSTOMER_ID References Customer
@@ -46,6 +46,7 @@ Part 3
 
 
 PROMPT *** DROP TABLES ***
+DROP TABLE Customer_Payment;
 DROP TABLE Customer_Booking;
 DROP TABLE Tour_Date_Gift;
 DROP TABLE Customer_Gift;
@@ -56,7 +57,6 @@ DROP TABLE Tour_Date_Experts;
 DROP TABLE Wine_Experts;
 DROP TABLE Tour_Date;
 DROP TABLE Wine_Tour;
-DROP TABLE Customer_Payment;
 
 PROMPT *** CREATE TABLE Wine_Tour ***
 CREATE TABLE Wine_Tour (
@@ -70,11 +70,10 @@ CREATE TABLE Wine_Tour (
 PROMPT *** CREATE TABLE Tour_Date ***
 /* GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1) */
 CREATE TABLE Tour_Date (
-	TD_ID NUMBER,
 	T_ID VARCHAR(2),
 	TD_Date DATE,
 	TD_Price NUMBER,
-	PRIMARY KEY(TD_ID),
+	PRIMARY KEY (T_ID, TD_Date),
 	FOREIGN KEY (T_ID) REFERENCES Wine_Tour
 );
 
@@ -89,9 +88,10 @@ CREATE TABLE Wine_Experts (
 
 PROMPT *** CREATE TABLE Tour_Date_Experts ***
 CREATE TABLE Tour_Date_Experts (
-	TD_ID NUMBER,
+	T_ID VARCHAR2(2),
+	TD_Date DATE,
 	Expert_ID NUMBER,
-	FOREIGN KEY (TD_ID) REFERENCES Tour_Date,
+	FOREIGN KEY (T_ID, TD_Date) REFERENCES TOUR_DATE,
 	FOREIGN KEY (Expert_ID) REFERENCES Wine_Experts
 );
 
@@ -107,48 +107,49 @@ CREATE TABLE Customer (
 
 PROMPT *** CREATE TABLE Brochure ***
 CREATE TABLE Brochure (
-	REQUEST_ID NUMBER,
 	T_ID VARCHAR(2),
 	CUSTOMER_ID VARCHAR2(4),
 	REQUEST_DATE VARCHAR2(20),
-	PRIMARY KEY(REQUEST_ID),
 	FOREIGN KEY (T_ID) REFERENCES Wine_Tour,
 	FOREIGN KEY (CUSTOMER_ID) REFERENCES Customer
 );
 
 PROMPT *** CREATE TABLE Gift ***
 CREATE TABLE Gift (
-	GIFT_ID NUMBER,
+	GIFT_ID VARCHAR2(4),
 	GIFT_NAME VARCHAR2(50),
 	PRIMARY KEY (GIFT_ID)
 );
 
 PROMPT *** CREATE TABLE Tour_Date_Gift ***
 CREATE TABLE Tour_Date_Gift (
-	TD_ID NUMBER,
-	GIFT_ID NUMBER,
-	FOREIGN KEY (TD_ID) REFERENCES Tour_Date,
+	T_ID VARCHAR2(2),
+	TD_Date DATE,
+	GIFT_ID VARCHAR2(4),
+	FOREIGN KEY (T_ID, TD_Date) REFERENCES TOUR_DATE,
 	FOREIGN KEY (GIFT_ID) REFERENCES Gift
 );
 
 PROMPT *** CREATE TABLE Customer_Gift ***
 CREATE TABLE Customer_Gift (
-	GIFT_ID NUMBER,
-	TD_ID NUMBER,
+	GIFT_ID VARCHAR2(4),
+	T_ID VARCHAR2(2),
+	TD_Date DATE,
 	CUSTOMER_ID VARCHAR2(4),
 	FOREIGN KEY (GIFT_ID) REFERENCES Gift,
-	FOREIGN KEY (TD_ID) REFERENCES Tour_Date,
+	FOREIGN KEY (T_ID, TD_Date) REFERENCES TOUR_DATE,
 	FOREIGN KEY (CUSTOMER_ID) REFERENCES Customer
 );
 
 PROMPT *** CREATE TABLE Customer_Booking ***
 CREATE TABLE Customer_Booking (
-	BOOKING_ID NUMBER,
+	BOOKING_ID NUMBER GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1),
 	CUSTOMER_ID VARCHAR2(4),
-	TD_ID NUMBER,
+	T_ID VARCHAR(2),
+	TD_Date DATE,
 	PRIMARY KEY (BOOKING_ID),
 	FOREIGN KEY (CUSTOMER_ID) REFERENCES Customer,
-	FOREIGN KEY (TD_ID) REFERENCES Tour_Date
+	FOREIGN KEY (T_ID, TD_Date) REFERENCES Tour_Date
 );
 
 PROMPT *** CREATE TABLE Customer_Payment
@@ -156,11 +157,11 @@ CREATE TABLE Customer_Payment (
 	PAYMENT_ID NUMBER GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1),
 	BOOKING_ID NUMBER,
 	CUSTOMER_ID  VARCHAR2(4),
-	PAYMENT_TYPE VARCHAR2(6),
+	PAYMENT_AMOUNT NUMBER,
 	PRIMARY KEY (PAYMENT_ID),
 	FOREIGN KEY (BOOKING_ID) REFERENCES Customer_Booking,
 	FOREIGN KEY (CUSTOMER_ID) REFERENCES Customer
-)
+);
 
 PROMPT *** INSERT QUERIES ***
 
@@ -171,16 +172,15 @@ INSERT INTO Wine_Tour (T_ID, T_Name, T_Description, T_Current_Price) VALUES ('W1
 INSERT INTO Wine_Tour (T_ID, T_Name, T_Description, T_Current_Price) VALUES ('S1', 'Sparkling Wine Tour', 'The region is famed for its interesting forms of sparkling wines. Our expert tour leader will ensure that this is an experience never to be forgotten', 250);
 
 PROMPT *** TOUR_DATE ***
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (1, 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 170);
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (2, 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 270);
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (3, 'B1', TO_DATE('2017/02/18', 'yyyy/mm/dd'), 280);
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (4, 'R2', TO_DATE('2017/02/18', 'yyyy/mm/dd'), 190);
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (5, 'R2', TO_DATE('2017/03/07', 'yyyy/mm/dd'), 200);
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (6, 'B1', TO_DATE('2017/03/14', 'yyyy/mm/dd'), 300);
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (7, 'W1', TO_DATE('2017/06/03', 'yyyy/mm/dd'), 200);
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (8, 'S1', TO_DATE('2017/10/27', 'yyyy/mm/dd'), 250);
-INSERT INTO Tour_Date (TD_ID, T_ID, TD_Date, TD_Price) VALUES (9, 'W1', TO_DATE('2017/10/29', 'yyyy/mm/dd'), 220);
-
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 170);
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 270);
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 280);
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 190);
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 200);
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('B1', TO_DATE('2018/03/14', 'yyyy/mm/dd'), 300);
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 200);
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('S1', TO_DATE('2018/10/27', 'yyyy/mm/dd'), 250);
+INSERT INTO Tour_Date (T_ID, TD_Date, TD_Price) VALUES ('W1', TO_DATE('2018/10/29', 'yyyy/mm/dd'), 220);
 
 PROMPT *** WINE_EXPERTS ***
 INSERT INTO Wine_Experts (Expert_ID, Expert_First_Name, Expert_Last_Name, Expert_Phone_Number) VALUES (5, 'Sue', 'Davies', 92142222);
@@ -190,44 +190,213 @@ INSERT INTO Wine_Experts (Expert_ID, Expert_First_Name, Expert_Last_Name, Expert
 
 
 PROMPT *** TOUR_DATE_EXPERTS ***
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (1, 12);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (1, 1);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (2, 1);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (3, 8);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (3, 5);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (4, 12);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (5, 1);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (6, 12);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (6, 8);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (7, 5);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (8, 5);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (9, 8);
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES (9, 12);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 12);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 1);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 1);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 8);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 5);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 12);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 1);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('B1', TO_DATE('2018/03/14', 'yyyy/mm/dd'), 1);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('B1', TO_DATE('2018/03/14', 'yyyy/mm/dd'), 8);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 5);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('S1', TO_DATE('2018/10/27', 'yyyy/mm/dd'), 5);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('W1', TO_DATE('2018/10/29', 'yyyy/mm/dd'), 8);
+INSERT INTO Tour_Date_Experts (T_ID, TD_DATE, Expert_ID) VALUES ('W1', TO_DATE('2018/10/29', 'yyyy/mm/dd'), 12);
 
 PROMPT *** Customer ***
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C123', 'Joel', 'Warren', '7 Bluff Rd', 92142277);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C218', 'Sue', 'Armstrong', '1 High St', 92149911);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C178', 'Grant', 'Simpson', '23 Wall St', 92133311);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C191', 'Sarah', 'Charter', '19 Hill Ave', 92134477);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C334', 'Helen', 'Chin', '6 Red Rd', 92145500);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C367', 'Ryan', 'Chin', '6 Red Rd', 92145522);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C555', 'Ted', 'Smith', '7 John St', 92148000);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C078', 'Clare', 'Watts', '15 Dale Rd', 92141166);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C267', 'Karen', 'Black', '1 Black St', 92148822);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C225', 'Ziggy', 'Lee', '17 Low St', 92149944);
-INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C215', 'Henry', 'Ryde', '8 White St', 92146688);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C123', 'Joel', 'Warren', '7 Bluff Rd', 92142277);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C218', 'Sue', 'Armstrong', '1 High St', 92149911);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C178', 'Grant', 'Simpson', '23 Wall St', 92133311);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C191', 'Sarah', 'Charter', '19 Hill Ave', 92134477);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C334', 'Helen', 'Chin', '6 Red Rd', 92145500);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C367', 'Ryan', 'Chin', '6 Red Rd', 92145522);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C555', 'Ted', 'Smith', '7 John St', 92148000);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C078', 'Clare', 'Watts', '15 Dale Rd', 92141166);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C267', 'Karen', 'Black', '1 Black St', 92148822);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C225', 'Ziggy', 'Lee', '17 Low St', 92149944);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone) VALUES ('C215', 'Henry', 'Ryde', '8 White St', 92146688);
 
-PROMT *** Brochure ***
-INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R001', 'W1', 'C267', TO_DATE('2017/06/19', 'yyyy/mm/dd'));
-INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R002', 'B1', 'C215', TO_DATE('2017/08/19', 'yyyy/mm/dd'));
-INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R003', 'W1', 'C225', TO_DATE('2017/09/15', 'yyyy/mm/dd'));
-INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R004', 'W1', 'C218', TO_DATE('2017/01/05', 'yyyy/mm/dd'));
-INSERT INTO Brochure (Request_ID, T_ID, Customer_ID, Request_Date) VALUES ('R005', 'W1', 'C334', TO_DATE('2017/01/06', 'yyyy/mm/dd'));
+PROMPT *** Brochure ***
+INSERT INTO Brochure (T_ID, Customer_ID, Request_Date) VALUES ('W1', 'C267', TO_DATE('2017/06/19', 'yyyy/mm/dd'));
+INSERT INTO Brochure (T_ID, Customer_ID, Request_Date) VALUES ('B1', 'C215', TO_DATE('2017/08/19', 'yyyy/mm/dd'));
+INSERT INTO Brochure (T_ID, Customer_ID, Request_Date) VALUES ('W1', 'C225', TO_DATE('2017/09/15', 'yyyy/mm/dd'));
+INSERT INTO Brochure (T_ID, Customer_ID, Request_Date) VALUES ('W1', 'C218', TO_DATE('2017/01/05', 'yyyy/mm/dd'));
+INSERT INTO Brochure (T_ID, Customer_ID, Request_Date) VALUES ('W1', 'C334', TO_DATE('2017/01/06', 'yyyy/mm/dd'));
 
-/* CONSTRAINT AU_AUTHOR UNIQUE (sname, fname) */
+PROMPT *** Gift ***
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G01', 'Collectors Red Wine Glass');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G02', 'Cord Screw');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G03', 'Sherry Glass');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G04', 'White Wine Glass');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G05', 'Guide to Wine Tasting Handbook');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G06', 'Winery Guide Handbook');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G07', 'Wine for Women Handbook');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G08', 'Wine Museum Voucher');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G09', 'Collectors Sparkling Wine Glass');
+INSERT INTO Gift (Gift_ID, Gift_Name) VALUES ('G10', 'Commemorative Cup');
+
+PROMPT *** Tour_Date_Gift ***
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'G01');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'G05');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'G07');
+
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'G01');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'G07');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'G09');
+
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 'G02');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 'G06');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 'G08');
+
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 'G01');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 'G04');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 'G06');
+
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 'G05');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 'G06');
+
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'G01');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'G02');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'G03');
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'G04');
+
+PROMPT *** Customer_Gift ***
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G01', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C123');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G01', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C218');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G05', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C218');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G05', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C178');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G07', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C178');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G05', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C191');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G05', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C334');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G07', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C367');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G07', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C555');
+
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G01', 'R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C078');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G07', 'R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C078');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G01', 'R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C267');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G07', 'R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C225');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G09', 'R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 'C225');
+
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G02', 'R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 'C218');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G06', 'R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 'C218');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G08', 'R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 'C191');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G02', 'R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'), 'C123');
+
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G04', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 'C123');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G04', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 'C225');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G06', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 'C225');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G01', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 'C367');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G04', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'), 'C367');
+
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G05', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 'C191');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G06', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 'C191');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G06', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 'C555');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G05', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 'C555');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G05', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 'C267');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G06', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'), 'C267');
+
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G01', 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'C225');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G04', 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'C225');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G02', 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'C078');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G03', 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'C078');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G04', 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'), 'C123');
+
+
+PROMPT *** Customer_Booking ***
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C123', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C218', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C178', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C191', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C334', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C367', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C555', 'B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C078', 'R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C267', 'R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C225', 'R2', TO_DATE('2018/02/18', 'yyyy/mm/dd'));
+
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C218', 'R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C191', 'R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C123', 'R2', TO_DATE('2018/03/07', 'yyyy/mm/dd'));
+
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C078', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C123', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C225', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C367', 'W1', TO_DATE('2018/06/03', 'yyyy/mm/dd'));
+
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C191', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C555', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C267', 'B1', TO_DATE('2017/11/11', 'yyyy/mm/dd'));
+
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C225', 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C078', 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'));
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_Date) VALUES ('C123', 'R2', TO_DATE('2017/10/07', 'yyyy/mm/dd'));
+
+
+PROMPT *** Customer_Payment ***
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (1, 'C123', 280);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (2, 'C218', 280);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (3, 'C178', 280);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (4, 'C191', 280);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (5, 'C334', 280);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (6, 'C367', 280);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (7, 'C555', 325);
+
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (8, 'C078', 190);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (9, 'C267', 190);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (10,'C225', 190);
+
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (11, 'C218', 200);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (12, 'C191', 200);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (13, 'C123', 270);
+
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (14, 'C078', 100);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (15, 'C123', 200);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (16, 'C225', 200);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (17, 'C367', 200);
+
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (18, 'C191', 270);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (19, 'C555', 270);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (20, 'C267', 270);
+
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (21, 'C225', 50);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (22, 'C078', 170);
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (23, 'C123', 170);
+
+
+PROMPT *** SELECT QUERY ***
+SELECT * FROM Customer_Payment;
+SELECT * FROM Customer_Booking;
+SELECT * FROM Tour_Date_Gift;
+SELECT * FROM Customer_Gift;
+SELECT * FROM Gift;
+SELECT * FROM Brochure;
+SELECT * FROM Customer;
+SELECT * FROM Tour_Date_Experts;
+SELECT * FROM Wine_Experts;
+SELECT * FROM Tour_Date;
+SELECT * FROM Wine_Tour;
 
 PROMPT *** Part 4 Invalid insert statements A test of Validation Rules ***
 
 INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES ('B1', 22);
 INSERT INTO Customer_Booking (CUSTOMER_ID, TD_ID) VALUES ('C078','W1');
-INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_TYPE) VALUES ('W1', 'C225', '');
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES ('W1', 'C225', '');
+INSERT INTO
+
+PROMPT *** Part 5 ***
+
+SELECT * FROM Customer ORDER BY Customer_ID;
+
+SELECT Tour_Date_Experts.T_ID, Tour_Date_Experts.TD_Date, Experts.Expert_First_Name, Experts.Expert_Last_Name FROM Tour_Date_Experts INNER JOIN Experts ON Tour_Date_Experts.Expert_ID = Experts.Expert_ID;
+
+SELECT Customer_Booking.T_ID, Customer_Booking.TD_Date, Customer_Booking.Customer_ID, Customer.First_Name, Customer.Last_Name Customer FROM Customer_Booking INNER JOIN Customer ON Customer_Booking.Customer_ID = Customer.Customer_ID;
+
+SELECT Tour_Date_Gift.T_ID, Tour_Date_Gift.TD_Date, Tour_Date_Gift.Gift_ID, Gift.Gift_Name FROM Tour_Date_Gift INNER JOIN Gift ON Tour_Date_Gift.Gift_ID = Gift.Gift_ID;
+
+SELECT Customer_Gift.T_ID, Customer_Gift.TD_Date, Customer_Gift.Customer_ID, Customer.Customer_First_Name, Customer.Customer_Last_Name, Customer_Gift.Gift_ID, Gift.Gift_Name FROM Customer_Gift INNER JOIN Customer ON Customer_Gift.Customer_ID = Customer.Customer_ID INNER JOIN Gift ON Customer_Gift.Gift_ID = Gift.Gift_ID;
+
+PROMPT *** Part 6 ***
+
+SELECT  FROM Customer_Payment
