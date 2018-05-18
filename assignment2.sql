@@ -212,6 +212,10 @@ INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Cust
 INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C334', 'Helen', 'Chin', '6 Red Rd', 92145500);
 INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C367', 'Ryan', 'Chin', '6 Red Rd', 92145522);
 INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C555', 'Ted', 'Smith', '7 John St', 92148000);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C078', 'Clare', 'Watts', '15 Dale Rd', 92141166);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C267', 'Karen', 'Black', '1 Black St', 92148822);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C225', 'Ziggy', 'Lee', '17 Low St', 92149944);
+INSERT INTO Customer (Customer_ID, Customer_First_Name, Customer_Last_Name, Custoemr_Address, Customer_Phone) VALUES ('C215', 'Henry', 'Ryde', '8 White St', 92146688);
 
 
 /* CONSTRAINT AU_AUTHOR UNIQUE (sname, fname) */
