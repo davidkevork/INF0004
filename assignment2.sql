@@ -380,10 +380,11 @@ SELECT * FROM Wine_Tour;
 
 PROMPT *** Part 4 Invalid insert statements A test of Validation Rules ***
 
-INSERT INTO Tour_Date_Experts (TD_ID, Expert_ID) VALUES ('B1', 22);
-INSERT INTO Customer_Booking (CUSTOMER_ID, TD_ID) VALUES ('C078','W1');
-INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES ('W1', 'C225', '');
-INSERT INTO
+INSERT INTO Tour_Date_Experts (T_ID, TD_Date, Expert_ID) VALUES ('B1', TO_DATE('2018/02/18', 'yyyy/mm/dd'), 22);
+INSERT INTO Customer_Booking (CUSTOMER_ID, T_ID, TD_DATE) VALUES ('C078','W1', TO_DATE('2018/01/01', 'yyyy/mm/dd'));
+INSERT INTO Customer_Payment (BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT) VALUES (50, 'C225', 100);
+INSERT INTO Tour_Date_Gift (T_ID, TD_DATE, Gift_ID) VALUES ('W1', TO_DATE('2018/01/01', 'yyyy/mm/dd'), 'G09');
+INSERT INTO Customer_Gift (GIFT_ID, T_ID, TD_Date, CUSTOMER_ID) VALUES ('G09', 'R2', TO_DATE('2018/10/07', 'yyyy/mm/dd'), 'C123');
 
 PROMPT *** Part 5 ***
 
