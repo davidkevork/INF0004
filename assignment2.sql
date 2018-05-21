@@ -389,14 +389,72 @@ PROMPT *** Part 5 ***
 
 SELECT * FROM Customer ORDER BY Customer_ID;
 
-SELECT Tour_Date_Experts.T_ID, Tour_Date_Experts.TD_Date, Experts.Expert_First_Name, Experts.Expert_Last_Name FROM Tour_Date_Experts INNER JOIN Experts ON Tour_Date_Experts.Expert_ID = Experts.Expert_ID;
+SELECT
+	Tour_Date_Experts.T_ID,
+	Tour_Date_Experts.TD_Date,
+	Wine_Experts.Expert_First_Name,
+	Wine_Experts.Expert_Last_Name
+	FROM Tour_Date_Experts
+	INNER JOIN Wine_Experts ON
+		Tour_Date_Experts.Expert_ID = Wine_Experts.Expert_ID
+	ORDER BY Wine_Experts.Expert_ID;
 
-SELECT Customer_Booking.T_ID, Customer_Booking.TD_Date, Customer_Booking.Customer_ID, Customer.First_Name, Customer.Last_Name Customer FROM Customer_Booking INNER JOIN Customer ON Customer_Booking.Customer_ID = Customer.Customer_ID;
+SELECT
+	Customer_Booking.T_ID,
+	Customer_Booking.TD_Date,
+	Customer_Booking.Customer_ID,
+	Customer.Customer_First_Name,
+	Customer.Customer_Last_Name
+	FROM Customer_Booking
+	INNER JOIN Customer ON
+		Customer_Booking.Customer_ID = Customer.Customer_ID
+	ORDER BY Customer_Booking.T_ID, Customer_Booking.TD_DATE, Customer.Customer_ID;
 
-SELECT Tour_Date_Gift.T_ID, Tour_Date_Gift.TD_Date, Tour_Date_Gift.Gift_ID, Gift.Gift_Name FROM Tour_Date_Gift INNER JOIN Gift ON Tour_Date_Gift.Gift_ID = Gift.Gift_ID;
+SELECT
+	Tour_Date_Gift.T_ID,
+	Tour_Date_Gift.TD_Date,
+	Tour_Date_Gift.Gift_ID,
+	Gift.Gift_Name
+	FROM Tour_Date_Gift
+	INNER JOIN Gift ON
+		Tour_Date_Gift.Gift_ID = Gift.Gift_ID
+	ORDER BY Tour_Date_Gift.T_ID, Tour_Date_Gift.TD_Date, Tour_Date_Gift.Gift_ID;
 
-SELECT Customer_Gift.T_ID, Customer_Gift.TD_Date, Customer_Gift.Customer_ID, Customer.Customer_First_Name, Customer.Customer_Last_Name, Customer_Gift.Gift_ID, Gift.Gift_Name FROM Customer_Gift INNER JOIN Customer ON Customer_Gift.Customer_ID = Customer.Customer_ID INNER JOIN Gift ON Customer_Gift.Gift_ID = Gift.Gift_ID;
+SELECT
+	Customer_Gift.T_ID,
+	Customer_Gift.TD_Date,
+	Customer_Gift.Customer_ID,
+	Customer.Customer_First_Name,
+	Customer.Customer_Last_Name,
+	Customer_Gift.Gift_ID,
+	Gift.Gift_Name
+	FROM Customer_Gift
+	INNER JOIN Customer ON
+		Customer_Gift.Customer_ID = Customer.Customer_ID
+	INNER JOIN Gift ON
+		Customer_Gift.Gift_ID = Gift.Gift_ID
+	ORDER BY Customer_Gift.T_ID, Customer_Gift.TD_Date, Customer_Gift.Customer_ID, Customer_Gift.Gift_ID;
 
 PROMPT *** Part 6 ***
 
-SELECT  FROM Customer_Payment
+SELECT Customer_Payment.Customer_ID, Customer.Customer_First_Name, Customer.Customer_Last_Name, SUM(Payment_Amount) AS Total FROM Customer_Payment INNER JOIN Customer ON Customer_Payment.Customer_ID = Customer.Customer_ID ORDER BY Customer_Payment.Customer_ID;
+
+SELECT Customer_Booking.T_ID, SUM(Customer_Payment.Payment_Amount) AS Total FROM Customer_Payment INNER JOIN Customer_Booking ON Customer_Payment.Booking_ID = Customer_Booking.Booking_ID ORDER BY Customer_Booking.T_ID;
+
+SELECT Customer_Gift.Gift_ID, Gift.Gift_Name, COUNT(*) FROM Customer_Gift INNER JOIN Gift ON Customer_Gift.Gift_ID = Gift.Gift_ID ORDER BY COUNT(*) DESC;
+
+SELECT Tour_Date.T_ID, Wine_Tour.T_Description, Tour_Date.TD_Price AS Current_Price, MIN(Tour_Date.TD_Price) AS Minimum_Price FROM Tour_Date INNER JOIN Wine_Tour ON Wine_Tour.T_ID = Tour_Date.T_ID;
+
+SELECT
+  Brochure.Customer_ID,
+  Customer.Customer_First_Name,
+  Customer.Customer_Last_Name,
+  Customer_Booking.T_ID,
+  Customer_Booking.TD_Date
+  FROM Customer
+  INNER JOIN Brochure ON
+    Brochure.Customer_ID = Customer.Customer_ID
+  INNER JOIN Customer_Booking ON
+    Brochure.Customer_ID = Customer_Booking.Customer_ID
+    AND
+    Brochure.T_ID = Customer_Booking.T_ID;
