@@ -437,13 +437,62 @@ SELECT
 
 PROMPT *** Part 6 ***
 
-SELECT Customer_Payment.Customer_ID, Customer.Customer_First_Name, Customer.Customer_Last_Name, SUM(Payment_Amount) AS Total FROM Customer_Payment INNER JOIN Customer ON Customer_Payment.Customer_ID = Customer.Customer_ID ORDER BY Customer_Payment.Customer_ID;
+SELECT
+	Customer.Customer_ID,
+	Customer.Customer_First_Name,
+	Customer.Customer_Last_Name,
+	(SELECT SUM(Customer_Payment.Payment_Amount) AS Total
+	FROM Customer_Payment WHERE Customer_Payment.CUSTOMER_ID = Customer.CUSTOMER_ID
+	)
+	FROM Customer_Payment
+	INNER JOIN Customer ON
+		Customer_Payment.Customer_ID = Customer.Customer_ID
+	GROUP BY Customer.CUSTOMER_ID
+	ORDER BY Customer_Payment.Customer_ID;
 
-SELECT Customer_Booking.T_ID, SUM(Customer_Payment.Payment_Amount) AS Total FROM Customer_Payment INNER JOIN Customer_Booking ON Customer_Payment.Booking_ID = Customer_Booking.Booking_ID ORDER BY Customer_Booking.T_ID;
+SELECT
+	Customer.CUSTOMER_ID,
+	Customer.Customer_First_Name,
+	Customer.Customer_Last_Name,
+	(
+		SELECT SUM(Customer_Payment.PAYMENT_AMOUNT)
+		FROM Customer_Payment
+		WHERE Customer_Payment.CUSTOMER_ID = Customer.CUSTOMER_ID
+	) AS TOTAL
+	FROM Customer
+	LEFT JOIN Customer_Payment ON
+		Customer_Payment.CUSTOMER_ID = Customer.CUSTOMER_ID
+	ORDER BY Customer.CUSTOMER_ID;
 
-SELECT Customer_Gift.Gift_ID, Gift.Gift_Name, COUNT(*) FROM Customer_Gift INNER JOIN Gift ON Customer_Gift.Gift_ID = Gift.Gift_ID ORDER BY COUNT(*) DESC;
+SELECT
+	Customer_Gift.GIFT_ID,
+	Gift.Gift_Name
+	FROM Customer_Gift
+	INNER JOIN Gift ON
+		Customer_Gift.Gift_ID = Gift.Gift_ID
+	GROUP BY Customer_Gift.Gift_ID = Gift.Gift_ID;
 
-SELECT Tour_Date.T_ID, Wine_Tour.T_Description, Tour_Date.TD_Price AS Current_Price, MIN(Tour_Date.TD_Price) AS Minimum_Price FROM Tour_Date INNER JOIN Wine_Tour ON Wine_Tour.T_ID = Tour_Date.T_ID;
+SELECT
+	Customer_Gift.Gift_ID,
+	Gift.Gift_Name,
+	COUNT(Gift.Gift_ID)
+	FROM Gift
+	INNER JOIN Customer_Gift ON
+		Customer_Gift.Gift_ID = Gift.Gift_ID
+	GROUP BY
+		Customer_Gift.Gift_ID, Gift.Gift_Name;
+
+SELECT
+	Tour_Date.T_ID AS "Tour Code",
+	Wine_Tour.T_Description AS "Description",
+	Tour_Date.TD_Price AS "Current Price",
+	(
+		SELECT MIN(Tour_Date.TD_Price) FROM Tour_Date
+		WHERE Tour_Date.T_ID = Wine_Tour.T_ID
+	) AS "Minimum Price"
+	FROM Tour_Date
+	INNER JOIN Wine_Tour ON
+		Wine_Tour.T_ID = Tour_Date.T_ID;
 
 SELECT
   Brochure.Customer_ID,
