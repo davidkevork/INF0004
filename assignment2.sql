@@ -23,9 +23,10 @@ FK: Customer_ID References Customer
 Gift ( Gift_ID, Gift_Name );
 PK: Gift_ID
 
-Tour_Date_Gift ( TD_ID, Gift_ID );
-FK TD_ID References Tour_Date
-FK Gift_ID References Gift
+Tour_Date_Gift ( T_ID, TD_DATE, Gift_ID );
+FK: T_ID References TOUR_DATE
+FK: TD_DATE References Tour_Date
+FK: Gift_ID References Gift
 
 Customer_Gift ( Gift_ID, Tour_Date_ID, Customer_ID );
 FK: Gift_ID References Gift
@@ -34,7 +35,7 @@ FK: Customer_ID References Customer
 
 Customer_Booking ( Customer_ID, T_ID, TD_Date );
 FK: Customer_ID References Customer
-FK: T_ID References WINE_TOUR
+FK: T_ID References TOUR_DATE
 FK: TD_Date References TOUR_DATE
 
 Customer_Payment (PAYMENT_ID, BOOKING_ID, CUSTOMER_ID, PAYMENT_AMOUNT)
