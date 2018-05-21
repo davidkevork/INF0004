@@ -8,15 +8,15 @@ FK: T_ID References Wine_Tour
 Wine_Experts (Expert_ID, Expert_First_Name, Expert_Last_Name, Expert_Phone_Number );
 PK: Expert_ID
 
-Tour_Date_Experts ( TD_ID, Expert_ID );
-FK: TD_ID References Tour_Date
+Tour_Date_Experts ( T_ID, TD_DATE, Expert_ID );
+FK: T_ID References TOUR_DATE
+FK: TD_DATE References TOUR_DATE
 FK: Expert_ID References  Wine_Experts
 
 Customer ( Customer_ID, Customer_First_Name, Customer_Last_Name, Customer_Address, Customer_Phone );
 PK: Customer_ID
 
 Brochure ( T_ID, Customer_ID, Request_Date );
-
 FK: T_ID References Wine_Tour
 FK: Customer_ID References Customer
 
