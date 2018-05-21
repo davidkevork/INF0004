@@ -2,7 +2,7 @@
 Wine_Tour ( T_ID, T_Name, T_Description, T_Current_Price );
 PK: T_ID
 
-Tour_Date ( T_ID, T_ID, TD_Date, TD_Price );
+Tour_Date ( T_ID, TD_Date, TD_Price );
 FK: T_ID References Wine_Tour
 
 Wine_Experts (Expert_ID, Expert_First_Name, Expert_Last_Name, Expert_Phone_Number );
